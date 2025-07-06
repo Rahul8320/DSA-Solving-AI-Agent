@@ -1,35 +1,28 @@
-import asyncio
-
-from autogen_agentchat.conditions import TextMentionTermination
-from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_agentchat.ui import Console
 
-from agents.code_executor_agent import DockerCodeExecutorAgent
-from agents.problem_solver_agent import DSAProblemSolverAgent
+import asyncio
+
+from teams.dsa_team import get_dsa_team
+from utils.docker_executor import DockerExecutor
+from utils.model_client import get_ollama_client
 
 
 async def main():
-    code_executor = DockerCodeExecutorAgent()
-    problem_solver_agent = DSAProblemSolverAgent().load()
+    docker_executor = DockerExecutor()
+    ollama_client = get_ollama_client()
 
-    termination_condition = TextMentionTermination("STOP")
-
-    team = RoundRobinGroupChat(
-        participants=[problem_solver_agent, code_executor.agent],
-        termination_condition= termination_condition,
-        max_turns= 10
-    )
+    dsa_team = get_dsa_team(model_client=ollama_client, executor=docker_executor.get())
 
     try:
-        await code_executor.docker.start()
-        task = "Write a Python code to check if the input number is even or odd."
+        await docker_executor.start()
+        task = input("Please give me a problem statement: ")
 
-        stream = team.run_stream(task=task)
+        stream = dsa_team.run_stream(task=task)
         await Console(stream=stream)
     except Exception as e:
         print(f"Error occurred: ", e)
     finally:
-        await code_executor.docker.stop()
+        await docker_executor.stop()
 
 if __name__ == "__main__":
     asyncio.run(main())
