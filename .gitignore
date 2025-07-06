@@ -8,8 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# env files
 .env
+.env.prod
 
 # IDE
 .vscode
 .idea
+
+# output folders
+temp/
