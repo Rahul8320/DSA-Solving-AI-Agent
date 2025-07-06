@@ -22,7 +22,7 @@ async def main():
 
     try:
         await code_executor.docker.start()
-        task = "Write a Python code to add two numbers."
+        task = "Write a Python code to check if the input number is even or odd."
 
         stream = team.run_stream(task=task)
         await Console(stream=stream)

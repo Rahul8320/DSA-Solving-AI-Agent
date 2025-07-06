@@ -23,7 +23,8 @@ class DSAProblemSolverAgent:
                     1. At the beginning of your response you have to specify your plan to solve the task.
                     2. Then you should give the code in a code block (Python).
                     3. You should write code in a one code block at a time and then pass it to code executor agent to execute it.
-                    4. Once the code is executed and if the same has been done successfully, you have the results.
+                    4. Also, You should write 3 test cases for the problem statement.
+                    4. Once the code is executed successfully, check if all 3 test case passed.If yes, then you have the results.
                     5. You should explain the code execution result.
                     
                 In the end once the code is executed successfully, you have to say "STOP" to stop the conversation. 
