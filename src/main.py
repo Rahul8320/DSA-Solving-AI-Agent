@@ -20,7 +20,7 @@ async def main():
         stream = dsa_team.run_stream(task=task)
         await Console(stream=stream)
     except Exception as e:
-        print(f"Error occurred: ", e)
+        print("Error occurred: ", e)
     finally:
         await docker_executor.stop()
 
