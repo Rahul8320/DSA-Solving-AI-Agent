@@ -2,6 +2,7 @@ import asyncio
 
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_agentchat.teams import RoundRobinGroupChat
+from autogen_agentchat.ui import Console
 
 from agents.code_executor_agent import DockerCodeExecutorAgent
 from agents.problem_solver_agent import DSAProblemSolverAgent
@@ -23,8 +24,8 @@ async def main():
         await code_executor.docker.start()
         task = "Write a Python code to add two numbers."
 
-        async for message in team.run_stream(task=task):
-            print(message)
+        stream = team.run_stream(task=task)
+        await Console(stream=stream)
     except Exception as e:
         print(f"Error occurred: ", e)
     finally:
