@@ -1,32 +1,30 @@
 import asyncio
 
-from autogen_agentchat.messages import TextMessage
-from autogen_core import CancellationToken
+from autogen_agentchat.conditions import TextMentionTermination
+from autogen_agentchat.teams import RoundRobinGroupChat
 
 from agents.code_executor_agent import DockerCodeExecutorAgent
+from agents.problem_solver_agent import DSAProblemSolverAgent
 
 
 async def main():
-    content: str = '''Here is some code
-```python
-def add(a:int, b:int)->int:
-    return a+b
-    
-print('Hello world')
-result = add(5,3)
-print(f"Sum of 5 and 3 is: {result}")
-```
-'''
-    task = TextMessage(content=content, source="user")
     code_executor = DockerCodeExecutorAgent()
+    problem_solver_agent = DSAProblemSolverAgent().load()
+
+    termination_condition = TextMentionTermination("STOP")
+
+    team = RoundRobinGroupChat(
+        participants=[problem_solver_agent, code_executor.agent],
+        termination_condition= termination_condition,
+        max_turns= 10
+    )
 
     try:
         await code_executor.docker.start()
-        response = await code_executor.agent.on_messages(
-            messages=[task],
-            cancellation_token=CancellationToken()
-        )
-        print("Response: ", response.chat_message)
+        task = "Write a Python code to add two numbers."
+
+        async for message in team.run_stream(task=task):
+            print(message)
     except Exception as e:
         print(f"Error occurred: ", e)
     finally:
